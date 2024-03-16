@@ -151,8 +151,8 @@ public class LyricsController implements Initializable {
     private void updateCurrentLyricIndex() {
         List<Lyric> lyrics = currentSong.getLyrics();
         for (int i = 0; i < lyrics.size() - 1; i++) {
-            double startTime = lyrics.get(i).getTime();
-            double endTime = lyrics.get(i + 1).getTime();
+            long startTime = lyrics.get(i).getTime();
+            long endTime = lyrics.get(i + 1).getTime();
 
             if (currentMillis >= startTime && currentMillis < endTime) {
                 currentLyricIndex = i;

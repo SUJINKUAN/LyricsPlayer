@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @Getter
 @Setter
 public class Lyric {
-    private double time;
+    private long time;
     private String text;
 
     public static List<Lyric> valueOf(String template) {
@@ -25,10 +25,10 @@ public class Lyric {
 
             Matcher timestampMatcher = Pattern.compile("\\[(\\d{2}):(\\d{2}\\.\\d{2,3})]").matcher(allTimestamps);
             while (timestampMatcher.find()) {
-                double minute = Double.parseDouble(timestampMatcher.group(1));
+                int minute = Integer.parseInt(timestampMatcher.group(1));
                 double second = Double.parseDouble(timestampMatcher.group(2));
                 Lyric lyric = new Lyric();
-                lyric.setTime((minute * 60 + second) * 1000);
+                lyric.setTime((long) ((minute * 60L + second) * 1000));
                 lyric.setText(lyricText);
                 lyrics.add(lyric);
             }
