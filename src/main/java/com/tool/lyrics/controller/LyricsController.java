@@ -14,6 +14,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -333,6 +334,7 @@ public class LyricsController implements Initializable {
                 stage.setTitle("版面設定");
                 stage.setResizable(false);
                 stage.setScene(new Scene(root, 350, 300));
+                stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/logo.png"))));
 
                 if (primaryStage != null) {
                     stage.initOwner(primaryStage);
