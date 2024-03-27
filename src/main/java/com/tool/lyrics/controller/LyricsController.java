@@ -39,10 +39,9 @@ import java.util.ResourceBundle;
 @Getter
 @Setter
 public class LyricsController implements Initializable {
-    private final int INTERVAL_MILLS = 200;
-    private final int DEFAULT_SECOND = 1;
+    private final int INTERVAL_MILLS = 10;
     private boolean clickLyric = true;
-
+    private long lastUpdateTime = System.currentTimeMillis();
 
     public Text currentText;
     public Label currentTimeLabel;
@@ -143,7 +142,11 @@ public class LyricsController implements Initializable {
     }
 
     private void handleTimeAction() {
-        currentMillis += INTERVAL_MILLS;
+        long now = System.currentTimeMillis();
+        long elapsed = now - lastUpdateTime;
+        currentMillis += elapsed;
+        lastUpdateTime = now;
+
         whenCurrentTimeChange();
         updateCurrentLyricIndex();
     }
