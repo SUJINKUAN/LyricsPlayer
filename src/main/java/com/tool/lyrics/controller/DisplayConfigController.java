@@ -1,12 +1,11 @@
 package com.tool.lyrics.controller;
 
 import com.tool.lyrics.model.DisplayConfig;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -85,7 +84,7 @@ public class DisplayConfigController {
 
     @FXML
     public void setConfig(MouseEvent mouseEvent) {
-        DisplayConfig config = lyricsPlayer.getAppConfig();
+        DisplayConfig config = DisplayConfig.getInstance();
         config.getFontStyle().setValue(fontTypeComboBox.getValue());
         config.getBgColor().setValue(toRGBCode(bgColorPicker.getValue()));
         config.getTextColor().setValue(toRGBCode(textColorPicker.getValue()));

@@ -6,6 +6,8 @@ import com.tool.lyrics.model.Song;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +17,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -36,19 +37,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static com.tool.lyrics.controller.LevitateLyricsController.*;
+
 @Getter
 @Setter
 public class LyricsController implements Initializable {
     private final int INTERVAL_MILLS = 10;
     private boolean clickLyric = true;
     private long lastUpdateTime = System.currentTimeMillis();
+    private long delayTime = 0;
 
+    private StringProperty currentLyrics = new SimpleStringProperty();
     public Text currentText;
     public Label currentTimeLabel;
     public Label totalTimeLabel;
     public Button displayConfigBtn;
+
     public Label visible;
     public CheckBox visibleCheckBox;
+    public Label levitateLyrics;
+    public CheckBox levitateLyricsCheckBox;
+
     public Button closeBtn;
     public Button quickPlayBtn;
     public Button backPlayBtn;
@@ -70,12 +79,14 @@ public class LyricsController implements Initializable {
     @FXML
     private Slider timeSlider;
     private Timeline timeline;
+
     private Song currentSong;
     private long currentMillis;
-    private DisplayConfig appConfig = new DisplayConfig();
     private int currentLyricIndex = -1;
     private Tooltip tooltip = new Tooltip();
     private Stage primaryStage;
+    private DisplayConfig appConfig;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -89,7 +100,20 @@ public class LyricsController implements Initializable {
         setLyricsViewList();
         setTimeConfig();
         setTimeSliderConfig();
+
+
+        initLevitateLyrics();
+        initCurrentLyricsListener();
+
         visibleCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> currentText.setVisible(newValue));
+        levitateLyricsCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> displayLevitateLyrics(newValue));
+    }
+
+    private void initCurrentLyricsListener() {
+        currentLyrics.addListener((observable, oldValue, newValue) -> {
+            currentText.setText(newValue);
+            updateLyrics(newValue);
+        });
     }
 
     private void bindProperties() {
@@ -134,6 +158,7 @@ public class LyricsController implements Initializable {
     }
 
     private void setDefaultConfig() {
+        appConfig = DisplayConfig.getInstance();
         appConfig.getFontSize().setValue(20);
         appConfig.getFontStyle().setValue("Verdana");
         appConfig.getTextAlignment().setValue(TextAlignment.RIGHT);
@@ -149,6 +174,7 @@ public class LyricsController implements Initializable {
 
         whenCurrentTimeChange();
         updateCurrentLyricIndex();
+
     }
 
     private void updateCurrentLyricIndex() {
@@ -231,7 +257,7 @@ public class LyricsController implements Initializable {
         if (Objects.nonNull(chooseSong)) {
             currentSong = chooseSong;
             List<Lyric> lyrics = currentSong.getLyrics();
-            double time = lyrics.get(lyrics.size() - 1).getTime();
+            double time = lyrics.getLast().getTime();
             timeSlider.setMax(time);
             totalTimeLabel.setText(formatDuration(time));
             displayLyrics(chooseSong);
@@ -275,8 +301,9 @@ public class LyricsController implements Initializable {
             timeline.pause();
             playBtn.setText("播放");
         } else {
+            lastUpdateTime = System.currentTimeMillis();
             timeline.play();
-            playBtn.setText("暫停");
+            playBtn.setText("暂停");
         }
 
     }
@@ -308,7 +335,7 @@ public class LyricsController implements Initializable {
 
             if (currentTimeSecs >= startTime && currentTimeSecs < endTime) {
                 String currentLyricText = lyrics.get(i).getText();
-                currentText.setText(currentLyricText);
+                currentLyrics.set(currentLyricText);
                 break;
             }
         }
@@ -324,7 +351,7 @@ public class LyricsController implements Initializable {
         return formatter.format(minutes) + ":" + formatter.format(seconds);
     }
 
-    public void showDisplayConfigWindow(MouseEvent event) {
+    public void showDisplayConfigWindow() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("DisplayConfig.fxml"));
             Parent root = loader.load();
@@ -347,8 +374,8 @@ public class LyricsController implements Initializable {
             } else {
                 System.err.println("Failed to load DisplayConfigController.fxml. Root is null.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
+
         }
     }
 

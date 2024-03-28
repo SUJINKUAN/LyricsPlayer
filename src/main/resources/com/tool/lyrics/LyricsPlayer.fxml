@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.layout.StackPane?>
 <AnchorPane prefHeight="420.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tool.lyrics.controller.LyricsController">
    <Slider fx:id="timeSlider" layoutX="28.0" layoutY="200.0" prefHeight="26.0" prefWidth="342.0" />
    <Label fx:id="currentTimeLabel" layoutX="373.0" layoutY="205.0" text="00:00" />
@@ -18,7 +19,9 @@
    <Button fx:id="displayConfigBtn" alignment="CENTER" layoutX="29.0" layoutY="345.0" mnemonicParsing="false" onMouseClicked="#showDisplayConfigWindow" prefHeight="33.0" prefWidth="109.0" text="顯示設定" />
    <Line endX="-90.46710205078125" endY="-16.840667724609375" layoutX="512.0" layoutY="221.0" startX="-100.0" />
    <Label fx:id="visible" layoutX="396.0" layoutY="247.0" text="顯示 :" />
+   <Label fx:id="levitateLyrics" layoutX="372.0" layoutY="267.0" text="懸浮歌詞 :" />
    <CheckBox fx:id="visibleCheckBox" layoutX="438.0" layoutY="247.0" mnemonicParsing="false" selected="true" />
+   <CheckBox fx:id="levitateLyricsCheckBox" layoutX="438.0" layoutY="267.0" mnemonicParsing="false"/>
    <Button fx:id="quickPlayBtn" layoutX="206.0" layoutY="242.0" mnemonicParsing="false" onMouseClicked="#doQuickPlay" text="快進" />
    <Button fx:id="backPlayBtn" layoutX="155.0" layoutY="242.0" mnemonicParsing="false" onMouseClicked="#doBackPlay" text="倒轉" />
    <Spinner fx:id="secondSpinner" layoutX="258.0" layoutY="242.0" prefHeight="26.0" prefWidth="65.0">

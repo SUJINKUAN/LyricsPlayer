@@ -13,6 +13,7 @@ import java.util.Objects;
 
 public class LyricsPlayerApp extends Application {
 
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -28,7 +29,6 @@ public class LyricsPlayerApp extends Application {
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root, 750, 420));
         primaryStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/logo.png"))));
-
         primaryStage.show();
     }
 }
