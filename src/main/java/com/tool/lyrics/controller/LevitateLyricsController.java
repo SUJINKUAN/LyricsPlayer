@@ -4,12 +4,15 @@ import com.tool.lyrics.model.DisplayConfig;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
+import static javafx.scene.Cursor.*;
 
 
 public class LevitateLyricsController {
@@ -25,29 +28,20 @@ public class LevitateLyricsController {
         StackPane root = new StackPane();
         root.getChildren().add(lyrics);
         root.setBackground(Background.EMPTY);
-        root.setStyle("-fx-background-color: transparent; -fx-padding: 10;");
-        root.setOnMouseEntered(event -> {
-            // 显示边框
-            root.setBorder(new Border(new BorderStroke(Color.BLUE,
-                    BorderStrokeStyle.SOLID,
-                    null,
-                    new BorderWidths(2))));
-        });
+        root.setStyle("-fx-background-color: rgba(255, 255, 255, 0.01);");
 
-        // 监听鼠标离开事件
-        root.setOnMouseExited(event -> {
-            // 隐藏边框
-            root.setBorder(Border.EMPTY);
-        });
+        root.setOnMouseEntered(event -> root.setStyle("-fx-background-color: rgba(255, 255, 255, 0.5);"));
+        root.setOnMouseExited(event -> root.setStyle("-fx-background-color: rgba(255, 255, 255, 0.01);"));
 
-        Scene scene = new Scene(root, 173, 445);
+
+        Scene scene = new Scene(root, 445, 173);
         scene.setFill(null);
+        initSceneEvent(scene);
 
         stage = new Stage();
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setScene(scene);
 
-        initSceneEvent(scene);
 
         stage.setAlwaysOnTop(true);
 
@@ -55,6 +49,8 @@ public class LevitateLyricsController {
     }
 
     private static void initSceneEvent(Scene scene) {
+        final double[] originSize = {scene.getWidth(), scene.getHeight()};
+
         scene.setOnMouseMoved(event -> {
             double x = event.getX();
             double y = event.getY();
@@ -62,15 +58,23 @@ public class LevitateLyricsController {
             double height = scene.getHeight();
 
             Cursor cursorType = Cursor.DEFAULT;
-            boolean resizeH = x < RESIZE_MARGIN || x > width - RESIZE_MARGIN;
-            boolean resizeV = y < RESIZE_MARGIN || y > height - RESIZE_MARGIN;
+            boolean inLeft = x < RESIZE_MARGIN;
+            boolean inRight = x > width - RESIZE_MARGIN;
+            boolean inTop = y < RESIZE_MARGIN;
+            boolean inBottom = y > height - RESIZE_MARGIN;
 
-            if (resizeH && resizeV) {
+            if (inTop && inLeft) {
+                cursorType = NW_RESIZE;
+            } else if (inTop && inRight) {
+                cursorType = Cursor.NE_RESIZE;
+            } else if (inBottom && inLeft) {
+                cursorType = SW_RESIZE;
+            } else if (inBottom && inRight) {
                 cursorType = Cursor.SE_RESIZE;
-            } else if (resizeH) {
-                cursorType = Cursor.E_RESIZE;
-            } else if (resizeV) {
-                cursorType = Cursor.N_RESIZE;
+            } else if (inRight || inLeft) {
+                cursorType = Cursor.H_RESIZE;
+            } else if (inTop || inBottom) {
+                cursorType = V_RESIZE;
             }
             scene.setCursor(cursorType);
         });
@@ -78,23 +82,43 @@ public class LevitateLyricsController {
         scene.setOnMousePressed(event -> {
             xOffset = event.getSceneX();
             yOffset = event.getSceneY();
+            // 记录按下时的窗口尺寸
+            originSize[0] = stage.getWidth();
+            originSize[1] = stage.getHeight();
         });
-        scene.setOnMouseDragged(event -> {
-            double x = event.getX();
-            double y = event.getY();
-            double width = x + xOffset;
-            double height = y + yOffset;
 
-            if (scene.getCursor() == Cursor.SE_RESIZE) {
-                stage.setWidth(width);
-                stage.setHeight(height);
-            } else if (scene.getCursor() == Cursor.E_RESIZE) {
-                stage.setWidth(width);
-            } else if (scene.getCursor() == Cursor.N_RESIZE) {
-                stage.setHeight(height);
+        scene.setOnMouseDragged(event -> {
+            if (scene.getCursor() != Cursor.DEFAULT) {
+                double deltaX = event.getScreenX() - xOffset - stage.getX();
+                double deltaY = event.getScreenY() - yOffset - stage.getY();
+
+                Cursor cursor = scene.getCursor();
+                if (cursor.equals(V_RESIZE)) {
+                    stage.setHeight(Math.max(originSize[1] + deltaY, originSize[1]));
+                } else if (cursor.equals(H_RESIZE)) {
+                    stage.setWidth(Math.max(originSize[0] + deltaX, originSize[0]));
+                } else if (cursor.equals(SE_RESIZE)) {
+                    stage.setWidth(Math.max(originSize[0] + deltaX, originSize[0]));
+                    stage.setHeight(Math.max(originSize[1] + deltaY, originSize[1]));
+                } else if (cursor.equals(NE_RESIZE)) {
+                    stage.setWidth(Math.max(originSize[0] + deltaX, originSize[0]));
+                    stage.setHeight(Math.max(deltaY + originSize[1], originSize[1]));
+                } else if (cursor.equals(SW_RESIZE)) {
+                    stage.setWidth(Math.max(deltaX + originSize[0], originSize[0]));
+                    stage.setHeight(Math.max(originSize[1] + deltaY, originSize[1]));
+                } else if (cursor.equals(NW_RESIZE)) {
+                    stage.setWidth(Math.max(deltaX + originSize[0], originSize[0]));
+                    stage.setHeight(Math.max(deltaY + originSize[1], originSize[1]));
+                }
+            } else {
+                // 拖动窗口
+                stage.setX(event.getScreenX() - xOffset);
+                stage.setY(event.getScreenY() - yOffset);
             }
         });
+
     }
+
 
     private static void bindProperties() {
         DisplayConfig appConfig = DisplayConfig.getInstance();
