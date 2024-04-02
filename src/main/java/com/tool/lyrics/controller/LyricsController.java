@@ -1,7 +1,8 @@
 package com.tool.lyrics.controller;
 
-import com.tool.lyrics.model.DisplayConfig;
+import com.tool.lyrics.model.LevitateDisplayConfig;
 import com.tool.lyrics.model.Lyric;
+import com.tool.lyrics.model.MainDisplayConfig;
 import com.tool.lyrics.model.Song;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -85,8 +86,9 @@ public class LyricsController implements Initializable {
     private int currentLyricIndex = -1;
     private Tooltip tooltip = new Tooltip();
     private Stage primaryStage;
-    private DisplayConfig appConfig;
-
+    private MainDisplayConfig mainConfig = MainDisplayConfig.getInstance();
+    private LevitateDisplayConfig levitateConfig = LevitateDisplayConfig.getInstance();
+    private Stage displayConfigStage;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,12 +97,13 @@ public class LyricsController implements Initializable {
 
     private void initializeListViews() {
         setDefaultConfig();
-        bindProperties();
+        bindMainDisplayProperties();
         setSongViewList();
         setLyricsViewList();
         setTimeConfig();
         setTimeSliderConfig();
 
+        initDisplayConfigStage();
 
         initLevitateLyrics();
         initCurrentLyricsListener();
@@ -116,11 +119,11 @@ public class LyricsController implements Initializable {
         });
     }
 
-    private void bindProperties() {
-        currentText.fillProperty().bind(Bindings.createObjectBinding(() -> Color.web(appConfig.getTextColor().getValue()), appConfig.getTextColor()));
-        lyricsArea.styleProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("-fx-control-inner-background:{0};", appConfig.getBgColor().getValue()), appConfig.getBgColor()));
-        currentText.fontProperty().bind(Bindings.createObjectBinding(() -> Font.font(appConfig.getFontStyle().getValue(), appConfig.getFontSize().getValue()), appConfig.getFontSize(), appConfig.getFontStyle()));
-        currentText.textAlignmentProperty().bind(appConfig.getTextAlignment());
+    private void bindMainDisplayProperties() {
+        currentText.fillProperty().bind(Bindings.createObjectBinding(() -> Color.web(mainConfig.getTextColor().getValue()), mainConfig.getTextColor()));
+        lyricsArea.styleProperty().bind(Bindings.createStringBinding(() -> MessageFormat.format("-fx-control-inner-background:{0};", mainConfig.getBgColor().getValue()), mainConfig.getBgColor()));
+        currentText.fontProperty().bind(Bindings.createObjectBinding(() -> Font.font(mainConfig.getFontStyle().getValue(), mainConfig.getFontSize().getValue()), mainConfig.getFontSize(), mainConfig.getFontStyle()));
+        currentText.textAlignmentProperty().bind(mainConfig.getTextAlignment());
     }
 
     private void setTimeConfig() {
@@ -158,12 +161,17 @@ public class LyricsController implements Initializable {
     }
 
     private void setDefaultConfig() {
-        appConfig = DisplayConfig.getInstance();
-        appConfig.getFontSize().setValue(20);
-        appConfig.getFontStyle().setValue("Verdana");
-        appConfig.getTextAlignment().setValue(TextAlignment.RIGHT);
-        appConfig.getTextColor().setValue("#ffffff");
-        appConfig.getBgColor().setValue("#000000");
+        mainConfig.getFontSize().setValue(20);
+        mainConfig.getFontStyle().setValue("Verdana");
+        mainConfig.getTextAlignment().setValue(TextAlignment.RIGHT);
+        mainConfig.getTextColor().setValue("#ffffff");
+        mainConfig.getBgColor().setValue("#000000");
+
+        levitateConfig.getFontSize().setValue(50);
+        levitateConfig.getFontStyle().setValue("Verdana");
+        levitateConfig.getTextAlignment().setValue(TextAlignment.RIGHT);
+        levitateConfig.getTextColor().setValue("#000000");
+        levitateConfig.getBgColor().setValue("#000000");
     }
 
     private void handleTimeAction() {
@@ -232,7 +240,7 @@ public class LyricsController implements Initializable {
                     Button deleteButton = new Button("删除");
                     deleteButton.setOnAction(event -> handleDeleteSong(item));
                     setGraphic(deleteButton);
-                    setContentDisplay(ContentDisplay.RIGHT);
+                    setContentDisplay(ContentDisplay.LEFT);
                 }
             }
         });
@@ -242,9 +250,11 @@ public class LyricsController implements Initializable {
 
     private void handleDeleteSong(Song song) {
         if (song.equals(currentSong)) {
+
             stopPlay();
             currentText.setText(null);
             lyrics.clear();
+            updateLyrics(null);
 
             totalTimeLabel.setText(formatDuration(0));
             timeSlider.setMax(0);
@@ -351,31 +361,38 @@ public class LyricsController implements Initializable {
         return formatter.format(minutes) + ":" + formatter.format(seconds);
     }
 
-    public void showDisplayConfigWindow() {
+    public void initDisplayConfigStage() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("DisplayConfig.fxml"));
             Parent root = loader.load();
             DisplayConfigController controller = loader.getController();
-            controller.initializeWithConfig(appConfig);
+            controller.initializeConfig();
             controller.setLyricsPlayer(this);
 
             if (root != null) {
-                Stage stage = new Stage();
-                stage.setTitle("版面設定");
-                stage.setResizable(false);
-                stage.setScene(new Scene(root, 350, 300));
-                stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/logo.png"))));
+                displayConfigStage = new Stage();
+                displayConfigStage.setTitle("版面設定");
+                displayConfigStage.setResizable(false);
+                displayConfigStage.setScene(new Scene(root));
+                displayConfigStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/logo.png"))));
 
                 if (primaryStage != null) {
-                    stage.initOwner(primaryStage);
+                    displayConfigStage.initOwner(primaryStage);
                 }
 
-                stage.show();
             } else {
                 System.err.println("Failed to load DisplayConfigController.fxml. Root is null.");
             }
         } catch (IOException ignored) {
 
+        }
+    }
+
+    public void showDisplayConfigWindow() {
+        if (displayConfigStage.isShowing()) {
+            displayConfigStage.toFront();
+        } else {
+            displayConfigStage.show();
         }
     }
 
@@ -408,5 +425,3 @@ public class LyricsController implements Initializable {
     }
 
 }
-
-

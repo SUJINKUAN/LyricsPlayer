@@ -9,19 +9,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class DisplayConfig {
+public class LevitateDisplayConfig {
     private StringProperty fontStyle = new SimpleStringProperty();
     private IntegerProperty fontSize = new SimpleIntegerProperty();
     private StringProperty textColor = new SimpleStringProperty();
     private StringProperty bgColor = new SimpleStringProperty();
     private ObjectProperty<TextAlignment> textAlignment = new SimpleObjectProperty<>();
 
-    public static DisplayConfig instance;
+    public static LevitateDisplayConfig instance;
 
 
-    public static DisplayConfig getInstance() {
+    public static LevitateDisplayConfig getInstance() {
         if (instance == null) {
-            instance = new DisplayConfig();
+            instance = new LevitateDisplayConfig();
         }
         return instance;
     }
