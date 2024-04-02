@@ -12,12 +12,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -29,7 +25,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
@@ -38,7 +33,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import static com.tool.lyrics.controller.LevitateLyricsController.*;
+import static com.tool.lyrics.LyricsPlayerApp.displayConfigStage;
+import static com.tool.lyrics.controller.LevitateLyricsController.displayLevitateLyrics;
+import static com.tool.lyrics.controller.LevitateLyricsController.updateLyrics;
 
 @Getter
 @Setter
@@ -88,7 +85,6 @@ public class LyricsController implements Initializable {
     private Stage primaryStage;
     private MainDisplayConfig mainConfig = MainDisplayConfig.getInstance();
     private LevitateDisplayConfig levitateConfig = LevitateDisplayConfig.getInstance();
-    private Stage displayConfigStage;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -103,9 +99,6 @@ public class LyricsController implements Initializable {
         setTimeConfig();
         setTimeSliderConfig();
 
-        initDisplayConfigStage();
-
-        initLevitateLyrics();
         initCurrentLyricsListener();
 
         visibleCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> currentText.setVisible(newValue));
@@ -361,32 +354,6 @@ public class LyricsController implements Initializable {
         return formatter.format(minutes) + ":" + formatter.format(seconds);
     }
 
-    public void initDisplayConfigStage() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("DisplayConfig.fxml"));
-            Parent root = loader.load();
-            DisplayConfigController controller = loader.getController();
-            controller.initializeConfig();
-            controller.setLyricsPlayer(this);
-
-            if (root != null) {
-                displayConfigStage = new Stage();
-                displayConfigStage.setTitle("版面設定");
-                displayConfigStage.setResizable(false);
-                displayConfigStage.setScene(new Scene(root));
-                displayConfigStage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/logo.png"))));
-
-                if (primaryStage != null) {
-                    displayConfigStage.initOwner(primaryStage);
-                }
-
-            } else {
-                System.err.println("Failed to load DisplayConfigController.fxml. Root is null.");
-            }
-        } catch (IOException ignored) {
-
-        }
-    }
 
     public void showDisplayConfigWindow() {
         if (displayConfigStage.isShowing()) {

@@ -12,18 +12,17 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import static com.tool.lyrics.LyricsPlayerApp.levitateLyricsStage;
 import static javafx.scene.Cursor.*;
 
 
 public class LevitateLyricsController {
-    private static Stage stage;
     private static Text lyrics;
     private static final double RESIZE_MARGIN = 10;
-
     private static double xOffset = 0;
     private static double yOffset = 0;
 
-    public static void initLevitateLyrics() {
+    public static void initLevitateLyricsStage() {
         lyrics = new Text();
 
         StackPane root = new StackPane();
@@ -37,12 +36,12 @@ public class LevitateLyricsController {
         scene.setFill(null);
         initSceneEvent(scene);
 
-        stage = new Stage();
-        stage.initStyle(StageStyle.TRANSPARENT);
-        stage.setScene(scene);
-        stage.setAlwaysOnTop(true);
+        levitateLyricsStage = new Stage();
+        levitateLyricsStage.initStyle(StageStyle.TRANSPARENT);
+        levitateLyricsStage.setScene(scene);
+        levitateLyricsStage.setAlwaysOnTop(true);
 
-        bindProperties();
+        bindLyricsProperties();
     }
 
     private static void initSceneEvent(Scene scene) {
@@ -91,10 +90,10 @@ public class LevitateLyricsController {
             double mouseY = event.getScreenY();
 
             if (scene.getCursor() != Cursor.DEFAULT) {
-                double newWidth = stage.getWidth();
-                double newHeight = stage.getHeight();
-                double newX = stage.getX();
-                double newY = stage.getY();
+                double newWidth = levitateLyricsStage.getWidth();
+                double newHeight = levitateLyricsStage.getHeight();
+                double newX = levitateLyricsStage.getX();
+                double newY = levitateLyricsStage.getY();
 
                 Cursor cursor = scene.getCursor();
                 if (cursor.equals(N_RESIZE)) {
@@ -126,23 +125,23 @@ public class LevitateLyricsController {
                 }
 
                 if (newWidth >= originSize[0]) {
-                    stage.setWidth(newWidth);
-                    stage.setX(newX);
+                    levitateLyricsStage.setWidth(newWidth);
+                    levitateLyricsStage.setX(newX);
                 }
                 if (newHeight >= originSize[1]) {
-                    stage.setHeight(newHeight);
-                    stage.setY(newY);
+                    levitateLyricsStage.setHeight(newHeight);
+                    levitateLyricsStage.setY(newY);
                 }
 
             } else {
-                stage.setX(mouseX - xOffset);
-                stage.setY(mouseY - yOffset);
+                levitateLyricsStage.setX(mouseX - xOffset);
+                levitateLyricsStage.setY(mouseY - yOffset);
             }
         });
     }
 
 
-    private static void bindProperties() {
+    private static void bindLyricsProperties() {
         LevitateDisplayConfig config = LevitateDisplayConfig.getInstance();
         lyrics.fillProperty().bind(Bindings.createObjectBinding(() -> Color.web(config.getTextColor().getValue()), config.getTextColor()));
         lyrics.fontProperty().bind(Bindings.createObjectBinding(() -> Font.font(config.getFontStyle().getValue(), config.getFontSize().getValue()), config.getFontSize(), config.getFontStyle()));
@@ -151,9 +150,9 @@ public class LevitateLyricsController {
 
     public static void displayLevitateLyrics(Boolean display) {
         if (display) {
-            stage.show();
+            levitateLyricsStage.show();
         } else {
-            stage.close();
+            levitateLyricsStage.close();
         }
     }
 

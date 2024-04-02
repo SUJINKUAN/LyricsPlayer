@@ -60,7 +60,6 @@ public class DisplayConfigController {
     private Button configCheckBtn;
     @FXML
     private Button configCancelBtn;
-    private LyricsController lyricsPlayer;
     private MainDisplayConfig mainDisplayConfig = MainDisplayConfig.getInstance();
     private LevitateDisplayConfig levitateDisplayConfig = LevitateDisplayConfig.getInstance();
 
