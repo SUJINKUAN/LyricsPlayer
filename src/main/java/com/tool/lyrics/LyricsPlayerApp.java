@@ -24,7 +24,7 @@ public class LyricsPlayerApp extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("LyricsPlayer.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tool/lyrics/LyricsPlayer.fxml"));
         Parent root = loader.load();
         LyricsController controller = loader.getController();
         controller.setPrimaryStage(primaryStage);
@@ -50,7 +50,7 @@ public class LyricsPlayerApp extends Application {
 
     public void initDisplayConfigStage() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("./controller/DisplayConfig.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/tool/lyrics/controller/DisplayConfig.fxml"));
             Parent root = loader.load();
             DisplayConfigController controller = loader.getController();
             controller.initializeConfig();
